@@ -1,24 +1,17 @@
-import type { Request, Response } from 'express';
-import { HttpError } from '../utils/httpError.js';
+import type { Request, Response, NextFunction } from "express";
+import { getConversions } from "../services/conversion.service.js";
 
-/**
- * Conversions controller
- * Handles HTTP requests related to conversion history
- */
+export async function getConversionsController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const conversions = await getConversions();
 
-/**
- * Get conversion history
- * GET /conversions
- */
-export async function getConversions(req: Request, res: Response): Promise<void> {
-  throw new HttpError(501, 'Not implemented');
-}
-
-/**
- * Get conversion by ID
- * GET /conversions/:id
- */
-export async function getConversionById(req: Request, res: Response): Promise<void> {
-  throw new HttpError(501, 'Not implemented');
+    res.json(conversions);
+  } catch (error) {
+    next(error);
+  }
 }
 

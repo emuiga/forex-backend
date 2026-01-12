@@ -1,17 +1,79 @@
-import type { Request, Response } from 'express';
-import { HttpError } from '../utils/httpError.js';
+import type { Request, Response, NextFunction } from "express";
+import { convertCurrency } from "../services/conversion.service.js";
+import { HttpError } from "../utils/httpError.js";
 
-/**
- * Convert controller
- * Handles HTTP requests for currency conversion
- */
+interface ConvertRequestBody {
+  amount?: number;
+  baseCurrency?: string;
+  targetCurrency?: string;
+}
 
-/**
- * Convert currency
- * POST /convert
- * Body: { amount: number, baseCurrency: string, targetCurrency: string }
- */
-export async function convert(req: Request, res: Response): Promise<void> {
-  throw new HttpError(501, 'Not implemented');
+export async function convertController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.body || typeof req.body !== "object") {
+      throw new HttpError(400, "Request body is required");
+    }
+
+    const { amount, baseCurrency, targetCurrency }: ConvertRequestBody = req.body;
+
+    if (amount === undefined || amount === null) {
+      throw new HttpError(400, "amount is required");
+    }
+
+    if (typeof amount !== "number" || isNaN(amount)) {
+      throw new HttpError(400, "amount must be a number");
+    }
+
+    if (amount <= 0) {
+      throw new HttpError(400, "amount must be greater than 0");
+    }
+
+    if (baseCurrency === undefined || baseCurrency === null) {
+      throw new HttpError(400, "baseCurrency is required");
+    }
+
+    if (typeof baseCurrency !== "string") {
+      throw new HttpError(400, "baseCurrency must be a string");
+    }
+
+    if (targetCurrency === undefined || targetCurrency === null) {
+      throw new HttpError(400, "targetCurrency is required");
+    }
+
+    if (typeof targetCurrency !== "string") {
+      throw new HttpError(400, "targetCurrency must be a string");
+    }
+
+    const normalizedBaseCurrency = baseCurrency.toUpperCase();
+    const normalizedTargetCurrency = targetCurrency.toUpperCase();
+
+    const result = await convertCurrency(amount, normalizedBaseCurrency, normalizedTargetCurrency);
+
+    res.status(201).json(result);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      next(error);
+      return;
+    }
+    if (error instanceof Error) {
+      if (error.message.includes("not found in exchange rates")) {
+        next(new HttpError(400, error.message));
+        return;
+      }
+      if (error.message.includes("Missing required environment variables")) {
+        next(new HttpError(500, "Exchange rate service configuration error"));
+        return;
+      }
+      if (error.message.includes("Failed to fetch") || error.message.includes("Exchange rate API")) {
+        next(new HttpError(502, "Exchange rate service unavailable"));
+        return;
+      }
+    }
+    next(error);
+  }
 }
 
