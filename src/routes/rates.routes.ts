@@ -1,14 +1,9 @@
-import { Router } from 'express';
-import { getRate } from '../controllers/rates.controller.js';
+import { Router } from "express";
+import { getRatesController } from "../controllers/rates.controller.js";
 
-/**
- * Routes for exchange rates endpoints
- */
 const router = Router();
 
-// GET /rates - Get exchange rate(s)
-// Query params: base, target (single) or base, targets (multiple)
-router.get('/', getRate);
+router.get("/", getRatesController);
 
 export default router;
 
