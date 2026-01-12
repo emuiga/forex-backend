@@ -1,0 +1,17 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Conversion {
+  id              String   @id @default(uuid())
+  amount          Decimal
+  baseCurrency    String
+  targetCurrency  String
+  conversionRate  Decimal
+  convertedAmount Decimal
+  createdAt       DateTime @default(now())
+}
