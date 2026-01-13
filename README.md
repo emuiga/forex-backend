@@ -127,6 +127,5 @@ Input validation is intentionally duplicated on frontend and backend.
 
 CORS is configured to allow a known frontend origin in development and can be restricted in production.
 
-The codebase is structured to allow easy modification during live review.
 
 
