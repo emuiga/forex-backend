@@ -54,7 +54,7 @@ Response:
   "conversionRate": 145.23,
   "convertedAmount": 14523
 }
-
+```
 
 Each successful conversion is persisted in the database.
 
@@ -126,6 +126,8 @@ Additional Notes
 Input validation is intentionally duplicated on frontend and backend.
 
 CORS is configured to allow a known frontend origin in development and can be restricted in production.
+
+All endpoints have been tested using Postman to ensure proper functionality.
 
 
 
