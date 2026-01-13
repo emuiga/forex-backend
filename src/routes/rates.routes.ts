@@ -7,3 +7,4 @@ router.get("/", getRatesController);
 
 export default router;
 
+
