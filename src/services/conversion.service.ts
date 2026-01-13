@@ -1,5 +1,4 @@
-import utilsPkg from "@prisma/client-runtime-utils";
-const { Decimal } = utilsPkg;
+import { Decimal } from "@prisma/client-runtime-utils";
 import prisma from "../db/prisma.js";
 import { getRates } from "./exchangeRate.service.js";
 
