@@ -8,9 +8,13 @@ export function errorMiddleware(
   next: NextFunction
 ): void {
   if (err instanceof HttpError) {
-    res.status(err.statusCode).json({
+    const response: { error: string; details?: unknown } = {
       error: err.message,
-    });
+    };
+    if (err.details) {
+      response.details = err.details;
+    }
+    res.status(err.statusCode).json(response);
     return;
   }
 

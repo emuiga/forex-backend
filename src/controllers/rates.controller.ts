@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { getRates } from "../services/exchangeRate.service.js";
 import { HttpError } from "../utils/httpError.js";
+import type { RatesQuery } from "../schemas/rates.schema.js";
 
 export async function getRatesController(
   req: Request,
@@ -8,18 +9,16 @@ export async function getRatesController(
   next: NextFunction
 ): Promise<void> {
   try {
-    const baseCurrency = (req.query.base as string) || "USD";
+    const { base }: RatesQuery = req.query as any;
 
-    const normalizedBaseCurrency = baseCurrency.toUpperCase();
-
-    const rates = await getRates(normalizedBaseCurrency);
+    const rates = await getRates(base);
 
     if (!rates || typeof rates !== "object" || Object.keys(rates).length === 0) {
       throw new HttpError(400, "Invalid base currency");
     }
 
     res.json({
-      base: normalizedBaseCurrency,
+      base,
       rates,
     });
   } catch (error) {

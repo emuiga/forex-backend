@@ -1,12 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { convertCurrency } from "../services/conversion.service.js";
 import { HttpError } from "../utils/httpError.js";
-
-interface ConvertRequestBody {
-  amount?: number;
-  baseCurrency?: string;
-  targetCurrency?: string;
-}
+import type { ConvertRequest } from "../schemas/convert.schema.js";
 
 export async function convertController(
   req: Request,
@@ -14,44 +9,9 @@ export async function convertController(
   next: NextFunction
 ): Promise<void> {
   try {
-    if (!req.body || typeof req.body !== "object") {
-      throw new HttpError(400, "Request body is required");
-    }
+    const { amount, baseCurrency, targetCurrency }: ConvertRequest = req.body;
 
-    const { amount, baseCurrency, targetCurrency }: ConvertRequestBody = req.body;
-
-    if (amount === undefined || amount === null) {
-      throw new HttpError(400, "amount is required");
-    }
-
-    if (typeof amount !== "number" || isNaN(amount)) {
-      throw new HttpError(400, "amount must be a number");
-    }
-
-    if (amount <= 0) {
-      throw new HttpError(400, "amount must be greater than 0");
-    }
-
-    if (baseCurrency === undefined || baseCurrency === null) {
-      throw new HttpError(400, "baseCurrency is required");
-    }
-
-    if (typeof baseCurrency !== "string") {
-      throw new HttpError(400, "baseCurrency must be a string");
-    }
-
-    if (targetCurrency === undefined || targetCurrency === null) {
-      throw new HttpError(400, "targetCurrency is required");
-    }
-
-    if (typeof targetCurrency !== "string") {
-      throw new HttpError(400, "targetCurrency must be a string");
-    }
-
-    const normalizedBaseCurrency = baseCurrency.toUpperCase();
-    const normalizedTargetCurrency = targetCurrency.toUpperCase();
-
-    const result = await convertCurrency(amount, normalizedBaseCurrency, normalizedTargetCurrency);
+    const result = await convertCurrency(amount, baseCurrency, targetCurrency);
 
     res.status(201).json(result);
   } catch (error) {
