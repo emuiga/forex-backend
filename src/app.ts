@@ -8,9 +8,7 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 const app = express();
 
 const corsOptions = {
-  origin: process.env.NODE_ENV === "production"
-    ? process.env.FRONTEND_ORIGIN
-    : "http://localhost:3001",
+  origin: process.env.FRONTEND_ORIGIN || "http://localhost:3001",
   credentials: true,
 };
 

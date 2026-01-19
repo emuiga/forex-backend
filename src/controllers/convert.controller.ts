@@ -28,7 +28,7 @@ export async function convertController(
         next(new HttpError(500, "Exchange rate service configuration error"));
         return;
       }
-      if (error.message.includes("Failed to fetch") || error.message.includes("Exchange rate API")) {
+      if (error.message.includes("Exchange rate API") || error.message.includes("request failed")) {
         next(new HttpError(502, "Exchange rate service unavailable"));
         return;
       }

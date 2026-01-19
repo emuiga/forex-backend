@@ -1,3 +1,5 @@
+import axios from "axios";
+
 interface ExchangeRateResponse {
   success: boolean;
   timestamp: number;
@@ -22,27 +24,25 @@ export async function getRates(
   url.searchParams.set("access_key", apiKey);
   url.searchParams.set("base", baseCurrency);
 
-  let response: Response;
-  try {
-    response = await fetch(url.toString());
-  } catch (error) {
-    throw new Error(
-      `Failed to fetch exchange rates: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Exchange rate API returned error: ${response.status} ${response.statusText}`
-    );
-  }
-
   let data: ExchangeRateResponse;
   try {
-    data = await response.json();
+    const response = await axios.get<ExchangeRateResponse>(url.toString());
+    data = response.data;
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        throw new Error(
+          `Exchange rate API returned error: ${error.response.status} ${error.response.statusText || error.message}`
+        );
+      }
+      if (error.request) {
+        throw new Error(
+          `Exchange rate API request failed: ${error.message}`
+        );
+      }
+    }
     throw new Error(
-      `Failed to parse exchange rate response: ${error instanceof Error ? error.message : "Unknown error"}`
+      `Failed to fetch exchange rates: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 
